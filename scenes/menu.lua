@@ -6,15 +6,12 @@ local composer = require( "composer" )
  
 local scene = composer.newScene()
 
-local function gotoGame()
-    composer.gotoScene( "game" )
-end
-
+local nameField = nil
+local gameField = nil
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
   
-
 -- create()
 function scene:create( event )
     
@@ -22,37 +19,51 @@ function scene:create( event )
     print("creating menu scene")
     local sceneGroup = self.view
 
-    local name = nil;
-    local game = nil;
+    gameField = native.newTextField( 10, 13, 25, 2 )
+    nameField = native.newTextField( 10, 10, 25, 2 )
+
+    local name = "player";
+    local game = "game1";
     local function nameListener( event )
+        -- TODO: make robust, fill the value while typing.
         if ( event.phase == "ended" or event.phase == "submitted" ) then
             print( event.target.text )
-            username = event.target.text
+            name = event.target.text
         end
     end
 
     local function gameListener( event )
+        -- TODO: make robust, fill the value while typing.
         if ( event.phase == "ended" or event.phase == "submitted" ) then
             print( event.target.text )
-            username = event.target.text
+            game = event.target.text
         end
     end
 
     local function play( event )
         print("name: " .. name)
         print("game: " .. game)
+        composer.gotoScene( "scenes.game" )
     end
 
-    local name = native.newTextField( 10, 10, 25, 2 )
-    name:addEventListener( "userInput", nameListener )
+    nameField.text = name;
+    nameField:addEventListener( "userInput", nameListener )
 
-    local game = native.newTextField( 10, 13, 25, 2 )
-    game:addEventListener( "userInput", gameListener )
+    gameField.text = game;
+    gameField:addEventListener( "userInput", gameListener )
 
     local playButton = display.newText( sceneGroup, "Play", display.contentCenterX, 15, native.systemFont, 1 )
     playButton:setFillColor( 0.82, 0.86, 1 )
     playButton:addEventListener( "tap", play )
 
+end
+
+
+-- hide()
+function scene:hide( event )
+    nameField.isVisible = false
+    gameField.isVisible = false
+    
 end
 
 -- -----------------------------------------------------------------------------------

@@ -12,6 +12,7 @@ function Snake:new(x, y)
         direction = direction.LEFT,
         displayGroup = display.newGroup()
     }
+    instance.displayGroup:insert(instance.head.displayObject)
 
     setmetatable(instance, Snake)
     return instance

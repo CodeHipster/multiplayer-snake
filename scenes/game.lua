@@ -2,12 +2,12 @@ local composer = require("composer")
 local Snake = require("models.snake")
 local Apple = require("models.apple")
 local direction = require("models.direction")
+local Grid = require("models.grid")
 
 local scene = composer.newScene()
 
 local state = {
     snake = nil,
-    apple = nil
 }
 
 local gameLoopTimer = nil
@@ -18,23 +18,13 @@ function scene:create(event)
 
     local sceneGroup = self.view
     -- draw a grid
-    local width = display.contentWidth
-    local height = display.contentHeight
-
-    for y = 0, height do
-        local line = display.newLine(sceneGroup, 0, y, width, y)
-        line.strokeWidth = 0.1
-    end
-
-    for x = 0, width do
-        local line = display.newLine(sceneGroup, x, 0, x, height)
-        line.strokeWidth = 0.1
-    end
+    local grid = Grid:new(display.contentWidth,  display.contentHeight)
+    sceneGroup:insert(grid.displayGroup)
 
     -- TODO: maybe have a lobby scene when we implement multiplayer?
     -- init state
-    state.snake = Snake:new(1, 1)
-    state.apple = Apple:new(20, 20)
+    state.snake = Snake:new(10, 10)
+    sceneGroup:insert(state.snake.displayGroup)
 
     -- start the loops
     local function gameLoop()

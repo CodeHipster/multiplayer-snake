@@ -33,12 +33,14 @@ function scene:create(event)
 
     -- TODO: maybe have a lobby scene when we implement multiplayer?
     -- init state
-    state.snake = Snake:new(10, 10)
+    state.snake = Snake:new(1, 1)
     state.apple = Apple:new(20, 20)
 
     -- start the loops
     local function gameLoop()
         print("game looping")
+        -- move snakes
+        state.snake:move()
     end
 
     gameLoopTimer = timer.performWithDelay(500, gameLoop, 0)

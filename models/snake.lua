@@ -1,4 +1,4 @@
-local direction = require("models.direction")
+local directions = require("models.directions")
 local SnakeHead = require("models.snakehead")
 
 local Snake = {}
@@ -9,7 +9,7 @@ function Snake:new(x, y)
     local instance = {
         -- Linked list for all the snake parts
         head = SnakeHead:new(x, y),
-        direction = direction.LEFT,
+        direction = directions.LEFT,
         displayGroup = display.newGroup()
     }
     instance.displayGroup:insert(instance.head.displayObject)

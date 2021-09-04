@@ -1,7 +1,7 @@
 local composer = require("composer")
 local Snake = require("models.snake")
 local Apple = require("models.apple")
-local direction = require("models.direction")
+local directions = require("models.directions")
 local Grid = require("models.grid")
 
 local scene = composer.newScene()
@@ -42,13 +42,13 @@ function scene:create(event)
 
         if event.phase == "down" then
             if event.keyName == 'w' then
-                state.snake:setDirection(direction.UP)
+                state.snake:setDirection(directions.UP)
             elseif event.keyName == 's' then
-                state.snake:setDirection(direction.DOWN)
+                state.snake:setDirection(directions.DOWN)
             elseif event.keyName == 'a' then
-                state.snake:setDirection(direction.LEFT)
+                state.snake:setDirection(directions.LEFT)
             elseif event.keyName == 'd' then
-                state.snake:setDirection(direction.RIGHT)
+                state.snake:setDirection(directions.RIGHT)
             end
         end
 

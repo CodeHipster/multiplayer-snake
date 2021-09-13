@@ -3,6 +3,14 @@ local Snake = require("models.snake")
 local Apple = require("models.apple")
 local directions = require("models.directions")
 local Grid = require("models.grid")
+local players = require("multiplayer.players");
+local State = require("models.state");
+local LockStepManager = require("lockstep.manager")
+local Renderer = require("render.Renderer");
+local InputProcessor = require("input.input-processor");
+local EventProcessor = require("lockstep.event-processor");
+local Clock = require("lockstep.game-clock");
+local Player = require("models.player");
 
 local scene = composer.newScene()
 
@@ -15,51 +23,43 @@ local gameLoopTimer = nil
 -- create()
 function scene:create(event)
     print("initializing game")
-
-    local sceneGroup = self.view
-    -- draw a grid
+    local sceneGroup = self.view 
+    
     local grid = Grid:new(display.contentWidth,  display.contentHeight)
-    sceneGroup:insert(grid.displayGroup)
-
-    -- TODO: maybe have a lobby scene when we implement multiplayer?
-    -- init state
-    state.snake = Snake:new(10, 10)
-    sceneGroup:insert(state.snake.displayGroup)
+    local initialState = State:new()
+    -- TODO: add the players to the state
+    for iter=1, #players do
+        local player = Player:new(10, 10, players[iter].name)
+        initialState:addPlayer(player)
+    end
+    
+    -- wire up all the components
+    local processor = EventProcessor:new()
+    local clock = Clock:new()
+    local manager = LockStepManager:new(initialState, clock, processor)
+    local renderer = Renderer:new(grid, sceneGroup)
+    local inputProcessor = InputProcessor:new(manager, clock)
 
     -- start the loops
     local function gameLoop()
         print("game looping")
-        -- move snakes
-        state.snake:move()
+        local state = manager:getState()
+        renderer:render(state)
     end
 
-    gameLoopTimer = timer.performWithDelay(500, gameLoop, 0)
+    gameLoopTimer = timer.performWithDelay(1000, gameLoop, 0)
 
-    local function onKeyEvent(event)
-        -- Print which key was pressed down/up
-        local message = "Key '" .. event.keyName .. "' was pressed " .. event.phase
-        print(message)
 
-        if event.phase == "down" then
-            if event.keyName == 'w' then
-                state.snake:setDirection(directions.UP)
-            elseif event.keyName == 's' then
-                state.snake:setDirection(directions.DOWN)
-            elseif event.keyName == 'a' then
-                state.snake:setDirection(directions.LEFT)
-            elseif event.keyName == 'd' then
-                state.snake:setDirection(directions.RIGHT)
-            end
-        end
-
-        -- IMPORTANT! Return false to indicate that this app is NOT overriding the received key
-        -- This lets the operating system execute its default handling of the key
-        return false
+    -- wrap method in function, as we can't directly feed a method into the Runtime
+    local function inputListener(event)
+        inputProcessor:onKeyEvent(event)
     end
+
     -- TODO: we should remove the listener as well when we switch scenes.
     -- TODO: can the listener be part of an object?
     -- Add the key event listener
-    Runtime:addEventListener("key", onKeyEvent)
+    Runtime:addEventListener("key", inputListener)
+
 end
 
 -- show()

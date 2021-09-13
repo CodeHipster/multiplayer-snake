@@ -7,7 +7,7 @@ function Player:new(x, y, name)
 
     return setmetatable({
         name = name,
-        Snake:new(x, y),
+        snake = Snake:new(x, y),
     }, self)
 end
 

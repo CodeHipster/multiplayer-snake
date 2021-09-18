@@ -4,12 +4,13 @@ local directions = require("models.directions");
 
 local InputProcessor = {}
 
-function InputProcessor:new(eventManager, clock)
+function InputProcessor:new(eventManager, clock, player)
     self.__index = self
 
     return setmetatable({
         eventManager = eventManager,
-        clock = clock
+        clock = clock,
+        player = player
     }, self)
 end
 
@@ -20,13 +21,13 @@ function InputProcessor:onKeyEvent(event)
 
     if event.phase == "down" then
         if event.keyName == 'w' then
-            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), "player", directions.UP))
+            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.UP))
         elseif event.keyName == 's' then
-            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), "player", directions.DOWN))
+            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.DOWN))
         elseif event.keyName == 'a' then
-            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), "player", directions.LEFT))
+            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.LEFT))
         elseif event.keyName == 'd' then
-            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), "player", directions.RIGHT))
+            self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.RIGHT))
         end
     end
 

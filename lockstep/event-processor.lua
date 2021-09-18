@@ -11,57 +11,55 @@ function EventProcessor:new ()
     }, self)
 end
 
-function EventProcessor:process(events, state, clock)
-    -- get all events within a game step. 
-    -- get the final events for the players
-    -- set the state for each player
-    -- apply game logic
-    -- redo until current time.
-    print("processing events: " .. #events)
-    print(inspect(events))
-
-    local now = clock:getTime()
-
-    local start = state.timestamp
-    local stepEnd = start+500
+function EventProcessor:process(events, state)
 
     local newState = state:copy()
 
-    while stepEnd < now do
-        for iter = 1, #events do
-            if events[iter].timestamp >= start and events[iter].timestamp < stepEnd then
-                -- apply event to state
-                print(events[iter].eventType)
-                if events[iter].eventType == "change-direction"  then
-                    print("changing direction")
-                    newState.players[1].snake:setDirection(events[iter].direction)
-                end
-            end
-        
+    for iter = 1, #events do
+        -- apply event to state
+        if events[iter].eventType == "change-direction"  then
+-- TODO: find players by name in the event.
+            newState.players[1].snake:setDirection(events[iter].direction)
         end
-        -- move snakes
-        for iter = 1, #state.players do
-            newState.players[iter].snake:move()
-        end
-        
-        -- set for next iteration
-        start = stepEnd 
-        stepEnd = start + 1000 --take 1000 ms steps for now
-    end
-
     
+        if events[iter].eventType == "move-snakes"  then
+            -- move snakes
+            for iter = 1, #state.players do
+                newState.players[iter].snake:move()
+            end
+        end
+    end
+            
+    return newState
+end
+
+-- TODO: remove duplicate code
+-- process events up to a timestamp (inclusive)
+function EventProcessor:processUntil(events, state, timestamp)
+
+    local newState = state:copy()
+
+    for iter = 1, #events do
+        if events[iter].timestamp > timestamp then
+            -- exit loop, all events up to timestamp have been processed.
+            break;
+        end
+
+        -- apply event to state
+        if events[iter].eventType == "change-direction"  then
+-- TODO: find players by name in the event.
+            newState.players[1].snake:setDirection(events[iter].direction)
+        end
+    
+        if events[iter].eventType == "move-snakes"  then
+            -- move snakes
+            for iter = 1, #state.players do
+                newState.players[iter].snake:move()
+            end
+        end
+    end
+            
     return newState
 end
 
 return EventProcessor
-
-
--- events: { {
---     16:30:13.096      direction = {
---     16:30:13.096        x = 0,
---     16:30:13.096        y = -1
---     16:30:13.096      },
---     16:30:13.096      eventType = "change-direction",
---     16:30:13.096      player = "player",
---     16:30:13.096      timestamp = 51465.2,
-    

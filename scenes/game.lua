@@ -11,6 +11,7 @@ local InputProcessor = require("input.input-processor");
 local EventProcessor = require("lockstep.event-processor");
 local Clock = require("lockstep.game-clock");
 local Player = require("models.player");
+local SnakeMoveTimer = require("lockstep.snake-move-timer");
 
 local scene = composer.newScene()
 
@@ -27,7 +28,7 @@ function scene:create(event)
     
     local grid = Grid:new(display.contentWidth,  display.contentHeight)
     local initialState = State:new()
-    -- TODO: add the players to the state
+    
     for iter=1, #players do
         local player = Player:new(10, 10, players[iter].name)
         initialState:addPlayer(player)
@@ -38,16 +39,17 @@ function scene:create(event)
     local clock = Clock:new()
     local manager = LockStepManager:new(initialState, clock, processor)
     local renderer = Renderer:new(grid, sceneGroup)
-    local inputProcessor = InputProcessor:new(manager, clock)
+    local inputProcessor = InputProcessor:new(manager, clock, players[1])
+    local snakeMoveTimer = SnakeMoveTimer:new(200, manager)
 
     -- start the loops
     local function gameLoop()
-        print("game looping")
+        snakeMoveTimer:generateEvents(clock:getTime())
         local state = manager:getState()
         renderer:render(state)
     end
 
-    gameLoopTimer = timer.performWithDelay(1000, gameLoop, 0)
+    gameLoopTimer = timer.performWithDelay(30, gameLoop, 0)
 
 
     -- wrap method in function, as we can't directly feed a method into the Runtime

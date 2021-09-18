@@ -20,7 +20,7 @@ function State:new()
     self.__index = self
 
     return setmetatable({
-        players = {},
+        players = {}, --table with player models
         timestamp = 0
     }, self)
 end

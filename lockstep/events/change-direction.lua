@@ -8,7 +8,7 @@ function ChangeDirection:new (timestamp, player, direction)
     return setmetatable({
         eventType = "change-direction",
         timestamp = timestamp,
-        player = player,
+        player = player, -- name of the player as string
         direction = direction
     }, self)
 end

@@ -25,7 +25,6 @@ function Renderer:new(grid, displayGroup)
 end
 
 function Renderer:render(state)
-    print("rendering state")
     -- empty previous state display
     self.state:removeSelf()
     self.state = display.newGroup();

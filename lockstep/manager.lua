@@ -59,7 +59,6 @@ function confirmedTimestamp(events, players)
 
     function done()
         for key, value in pairs(playerTimestamps) do
-            print(key, " -- ", value)
             if (value == -1) then
                 return false
             end
@@ -71,7 +70,6 @@ function confirmedTimestamp(events, players)
         local min = -1
 
         for key, value in pairs(playerTimestamps) do
-            print(key, " -- ", value)
             if (min == -1 or value < min) then
                 min = value
             end

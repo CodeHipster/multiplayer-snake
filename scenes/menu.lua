@@ -3,6 +3,7 @@
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local composer = require( "composer" )
+local players = require("multiplayer.players");
  
 local scene = composer.newScene()
 
@@ -43,8 +44,9 @@ function scene:create( event )
     local function play( event )
         print("name: " .. name)
         print("game: " .. game)
+        players.addLocalPlayer(name)
         composer.gotoScene( "scenes.game" )
-    end
+    end 
 
     nameField.text = name;
     nameField:addEventListener( "userInput", nameListener )

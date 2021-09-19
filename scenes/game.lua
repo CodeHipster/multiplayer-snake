@@ -12,6 +12,7 @@ local EventProcessor = require("lockstep.event-processor");
 local Clock = require("lockstep.game-clock");
 local Player = require("models.player");
 local SnakeMoveTimer = require("lockstep.snake-move-timer");
+local inspect = require("inspect");
 
 local scene = composer.newScene()
 
@@ -29,7 +30,9 @@ function scene:create(event)
     local grid = Grid:new(display.contentWidth,  display.contentHeight)
     local initialState = State:new()
     
+    print(inspect(players))
     for iter=1, #players do
+        print("adding player: ".. players[iter].name)
         local player = Player:new(10, 10, players[iter].name)
         initialState:addPlayer(player)
     end

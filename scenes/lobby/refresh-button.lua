@@ -1,10 +1,12 @@
 local RefreshButton = {}
 
 function RefreshButton:new(lobbyManager)
+    local group = display.newGroup();
     local width = 5
     local height = 3
 
     local background = display.newRect(20, 21, width, height);
+    group:insert(background)
     background:setFillColor(0.2);
     background:translate(width / 2, height / 2)
 
@@ -18,9 +20,10 @@ function RefreshButton:new(lobbyManager)
     }
     local button = display.newText(buttonOptions)
     button:translate(width / 2, height / 2)
+    group:insert(button)
     background:addEventListener( "tap", lobbyManager.refresh )
 
-    return button
+    return group
 end
 
 return RefreshButton

@@ -11,7 +11,7 @@ function Title:new()
         fontSize = 3,
         align = "center"
     }
-    display.newText(titleOptions)
+    return display.newText(titleOptions)
 end
 
 return Title

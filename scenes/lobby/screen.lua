@@ -10,9 +10,13 @@ local NameField = require("scenes.lobby.name-field");
 local JoinButton = require("scenes.lobby.join-button")
 local RefreshButton = require("scenes.lobby.refresh-button")
 local players = require("multiplayer.players")
+local inspect = require("inspect")
 
 local scene = composer.newScene()
 
+
+-- objects that need hiding, like native text input.
+local hidables = {}
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -22,11 +26,19 @@ function scene:create(event)
 --TODO: add all display objects to sceneContainer
 --TODO: network calls
 --TODO: classfile for the lobby manager
+    local sceneGroup = self.view
+
     -- titles
-    Title:new()
+    local title = Title:new()
+    sceneGroup:insert(title)
 
     -- input field for name
     local nameField = NameField:new()
+    table.insert(hidables, nameField)
+    print(inspect(nameField))
+    sceneGroup:insert(nameField)
+
+    local gamesList
 
     -- lobby manager
     local lobbyManager = {
@@ -37,11 +49,14 @@ function scene:create(event)
     }
     function lobbyManager.play.tap()
         print("play button clicked")
+        if(lobbyManager.selectedGame == nil) then
+            gamesList:createNewGame(nameField.name)
+        end
         players.addLocalPlayer(nameField.name)
-        composer.gotoScene("scenes.game")
+        -- composer.gotoScene("scenes.game")
     end
     function lobbyManager.refresh.tap()
-        print("refresh button clicked")
+        gamesList:refresh()
     end
     function lobbyManager.selectGame(game)
         print("selecting game: " .. game)
@@ -55,19 +70,24 @@ function scene:create(event)
     end
 
     -- show list of games
-    GamesList:new(lobbyManager)
+    gamesList = GamesList:new(lobbyManager)
+    sceneGroup:insert(gamesList)
 
     -- join button
-    JoinButton:new(lobbyManager)
+    local join = JoinButton:new(lobbyManager)
+    sceneGroup:insert(join)
 
     -- refresh button
-    RefreshButton:new(lobbyManager)
+    local refresh = RefreshButton:new(lobbyManager)
+    sceneGroup:insert(refresh)
 
 end
 
 -- hide()
 function scene:hide(event)
-
+    for iter = 1, #hidables do
+        hidables[iter]:hide()
+    end
 end
 
 -- -----------------------------------------------------------------------------------

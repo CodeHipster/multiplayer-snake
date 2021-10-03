@@ -1,10 +1,9 @@
 local inspect = require("inspect");
 local players = {}
 
-print("in multiplayer.players")
-
 function players.addLocalPlayer(name)
-    print(inspect(name))
+    print("adding local player: " .. name)
+    players.localPlayer = name
     table.insert(players, {
         name = name,
         input = true

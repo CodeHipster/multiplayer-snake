@@ -19,11 +19,11 @@ function GameEntry:new(name, color, position, listener)
     entry:insert(background)
     entry:insert(text)
 
-    function beep(event)
+    local function onClick(event)
         listener(name)
     end
 
-    entry:addEventListener("tap", beep )
+    entry:addEventListener("tap", onClick )
     return entry
 end
 

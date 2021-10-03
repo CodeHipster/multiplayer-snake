@@ -27,56 +27,49 @@ function GamesList:new(lobbyManager)
         self.count = self.count + 1
     end
 
+    function gamesList.handleResponse(event)
+        if (event.isError) then
+            print("Network error: ", event.response)
+        else
+            -- empty: gamesList
+            for iter = gamesList.numChildren, 1, -1 do
+                gamesList:remove(iter)
+            end
+            gamesList.count = 0
+
+            local games, pos, msg = json.decode(event.response)
+            for iter = 1, #games do
+                gamesList:addGame(games[iter].name)
+            end
+            -- removing objects does not automatically change the scroll height...
+            gamesList:setScrollHeight(gamesList.count * 4)
+        end
+    end
+
     function gamesList:refresh()
         print("refreshing games")
 
-        local function gamesListener(event)
-
-            if (event.isError) then
-                print("Network error: ", event.response)
-            else
-                print("RESPONSE: " .. event.response)
-                local games, pos, msg = json.decode(event.response)
-                print(inspect(games))
-                for iter = 1, #games do
-                    gamesList:addGame(games[iter].name)
-                end
-            end
-        end
-
-        network.request("http://localhost:8080/games", "GET", gamesListener)
-
+        network.request("http://localhost:8080/games", "GET", gamesList.handleResponse)
     end
 
     function gamesList:createNewGame(name)
+        local params = {
+            headers = {
+                ["Content-Type"] = "application/json"
+            },
+            body = json.encode({
+                name = name
+            })
+        }
 
-        -- TODO: deduplicate & clear gameslist before adding new again.
-        local function createListener(event)
-
-            if (event.isError) then
-                print("Network error: ", event.response)
-            else
-                print("RESPONSE: " .. event.response)
-                local games, pos, msg = json.decode(event.response)
-                print(inspect(games))
-                for iter = 1, #games do
-                    gamesList:addGame(games[iter].name)
-                end
+        local function wrapHandler(event)
+            gamesList.handleResponse(event)
+            if (not event.isError) then
+                lobbyManager.selectGame(name)
             end
         end
-        local headers = {}
 
-        headers["Content-Type"] = "application/json"
-
-        local body = json.encode({
-            name = name
-        });
-
-        local params = {}
-        params.headers = headers
-        params.body = body
-
-        network.request("http://localhost:8080/games", "POST", createListener, params)
+        network.request("http://localhost:8080/games", "POST", wrapHandler, params)
     end
 
     -- do an initial refresh

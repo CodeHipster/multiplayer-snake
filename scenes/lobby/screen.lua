@@ -6,10 +6,11 @@ local composer = require("composer")
 local GameEntry = require("scenes.lobby.game-entry")
 local GamesList = require("scenes.lobby.games-list")
 local Title = require("scenes.lobby.title")
-local NameField = require("scenes.lobby.name-field");
+local NameField = require("scenes.lobby.name-field")
 local JoinButton = require("scenes.lobby.join-button")
 local RefreshButton = require("scenes.lobby.refresh-button")
 local players = require("multiplayer.players")
+local game = require("multiplayer.game");
 local inspect = require("inspect")
 
 local scene = composer.newScene()
@@ -35,7 +36,6 @@ function scene:create(event)
     -- input field for name
     local nameField = NameField:new()
     table.insert(hidables, nameField)
-    print(inspect(nameField))
     sceneGroup:insert(nameField)
 
     local gamesList
@@ -51,9 +51,11 @@ function scene:create(event)
         print("play button clicked")
         if(lobbyManager.selectedGame == nil) then
             gamesList:createNewGame(nameField.name)
+        else
+            players.addLocalPlayer(nameField.name)
+            game.setName(lobbyManager.selectedGame)
+            composer.gotoScene("scenes.waiting-room.screen")
         end
-        players.addLocalPlayer(nameField.name)
-        -- composer.gotoScene("scenes.game")
     end
     function lobbyManager.refresh.tap()
         gamesList:refresh()

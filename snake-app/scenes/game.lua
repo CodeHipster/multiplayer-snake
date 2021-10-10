@@ -12,7 +12,10 @@ local EventProcessor = require("lockstep.event-processor");
 local Clock = require("lockstep.game-clock");
 local Player = require("models.player");
 local SnakeMoveTimer = require("lockstep.snake-move-timer");
+local socket = require("multiplayer.socket")
 local inspect = require("inspect");
+local json = require("json")
+local ChangeDirection = require("lockstep.events.change-direction")
 
 local scene = composer.newScene()
 
@@ -21,6 +24,7 @@ local state = {
 }
 
 local gameLoopTimer = nil
+
 
 -- create()
 function scene:create(event)
@@ -38,12 +42,41 @@ function scene:create(event)
     end
     
     -- wire up all the components
+    local websocket = socket.get()
     local processor = EventProcessor:new()
     local clock = Clock:new()
     local manager = LockStepManager:new(initialState, clock, processor)
     local renderer = Renderer:new(grid, sceneGroup)
-    local inputProcessor = InputProcessor:new(manager, clock, players[1])
+    --TODO: get player controlling the input.
+    local inputProcessor = InputProcessor:new(manager, clock, players[1], websocket)
     local snakeMoveTimer = SnakeMoveTimer:new(200, manager)
+
+
+    local function socketHandler(event)
+        if event.type == websocket.ONMESSAGE then
+            print('game received message' .. inspect(event))
+            local input, pos, msg = json.decode(event.data)                    
+            if msg then
+                print("error decoding json.")
+                return
+            end
+        
+            if not input.type then
+                print("message has no type")
+                return
+            elseif input.type ~= "input" then
+                print("message was not for input handler")
+                return
+            end
+            manager:addEvent(ChangeDirection:new(input.time, input.player, input.direction))
+        elseif event.type == websocket.ONCLOSE then
+            print('game disconnected')
+        elseif event.type == websocket.ONERROR then
+            print('game error')
+        end
+    end
+
+    websocket:addEventListener(websocket.WSEVENT, socketHandler)
 
     -- start the loops
     local function gameLoop()
@@ -53,7 +86,6 @@ function scene:create(event)
     end
 
     gameLoopTimer = timer.performWithDelay(30, gameLoop, 0)
-
 
     -- wrap method in function, as we can't directly feed a method into the Runtime
     local function inputListener(event)

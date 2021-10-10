@@ -53,6 +53,7 @@ public class SnakeSocket {
     }
 
     private void broadcast(List<Session> sessions, String message) {
+        // TODO: exclude sending session?
         sessions.forEach(s -> s.getAsyncRemote().sendObject(message, result -> {
             if (result.getException() != null) {
                 LOG.error("Unable to send message.", result.getException());

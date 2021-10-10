@@ -1,16 +1,18 @@
-local ChangeDirection = require("lockstep.events.change-direction");
+local ChangeDirection = require("lockstep.events.change-direction")
 local players = require("multiplayer.players")
-local directions = require("models.directions");
+local directions = require("models.directions")
+local json = require("json")
 
 local InputProcessor = {}
 
-function InputProcessor:new(eventManager, clock, player)
+function InputProcessor:new(eventManager, clock, player, websocket)
     self.__index = self
 
     return setmetatable({
         eventManager = eventManager,
         clock = clock,
-        player = player
+        player = player,
+        ws = websocket
     }, self)
 end
 
@@ -22,12 +24,16 @@ function InputProcessor:onKeyEvent(event)
     if event.phase == "down" then
         if event.keyName == 'w' then
             self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.UP))
+            self.ws:send(json.encode({type = "input", time =self.clock:getTime(), player = self.player.name, direction = directions.UP}))
         elseif event.keyName == 's' then
             self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.DOWN))
+            self.ws:send(json.encode({type = "input", time =self.clock:getTime(), player = self.player.name, direction = directions.DOWN}))
         elseif event.keyName == 'a' then
             self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.LEFT))
+            self.ws:send(json.encode({type = "input", time =self.clock:getTime(), player = self.player.name, direction = directions.LEFT}))
         elseif event.keyName == 'd' then
             self.eventManager:addEvent(ChangeDirection:new(self.clock:getTime(), self.player.name, directions.RIGHT))
+            self.ws:send(json.encode({type = "input", time =self.clock:getTime(), player = self.player.name, direction = directions.RIGHT}))
         end
     end
 

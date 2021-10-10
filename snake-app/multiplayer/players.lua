@@ -10,12 +10,22 @@ function players.addLocalPlayer(name)
     });
 end
 
+-- returns false if the player was not added. otherwise true.
 function players.addMultiPlayer(name)
--- TODO: ensure unique
+
+    for iter = 1, #players do
+        if players[iter].name == name then
+            -- TODO, handle other player having same name.
+            return false
+        end
+    end
+
     table.insert(players, {
         name = name,
         input = false
     });
+    print("added player: " .. name)
+    return true
 end
 
 return players

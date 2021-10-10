@@ -18,8 +18,11 @@ function EventProcessor:process(events, state)
     for iter = 1, #events do
         -- apply event to state
         if events[iter].eventType == "change-direction"  then
--- TODO: find players by name in the event.
-            newState.players[1].snake:setDirection(events[iter].direction)
+            for pi = 1, #newState.players do
+                if newState.players[pi].name == events[iter].player then
+                    newState.players[pi].snake:setDirection(events[iter].direction)
+                end
+            end
         end
     
         if events[iter].eventType == "move-snakes"  then
@@ -47,8 +50,11 @@ function EventProcessor:processUntil(events, state, timestamp)
 
         -- apply event to state
         if events[iter].eventType == "change-direction"  then
--- TODO: find players by name in the event.
-            newState.players[1].snake:setDirection(events[iter].direction)
+            for pi = 1, #newState.players do
+                if newState.players[pi].name == events[iter].player then
+                    newState.players[pi].snake:setDirection(events[iter].direction)
+                end
+            end
         end
     
         if events[iter].eventType == "move-snakes"  then

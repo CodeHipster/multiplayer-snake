@@ -1,18 +1,22 @@
-local function WsHandler(event)
-    if event.type == ws.ONOPEN then
-        print('connected')
-    elseif event.type == ws.ONMESSAGE then
-        print('message')
-    elseif event.type == ws.ONCLOSE then
-        print('disconnected')
-    elseif event.type == ws.ONERROR then
-        print('error')
-    end
+local WebSockets = require("plugin.websockets")
+local inspect = require('inspect')
+
+local ws = WebSockets.new()
+
+local socket = {}
+
+function socket.connect(game)
+    -- TODO: can we have multiple connections from a single client?
+    -- TODO: how can we check if it is already connected to and endpoint or not?
+    ws:connect('ws://127.0.0.1/games/' .. game, {
+        port = 8080
+    })
+    return ws
 end
-  
-ws:addEventListener(ws.WSEVENT, WsHandler)
 
-ws:connect('ws://127.0.0.1/snake', {port=8080})
+function socket.get()
+    return ws
+end
 
+return socket
 
-ws:send()
